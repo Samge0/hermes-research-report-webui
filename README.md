@@ -4,9 +4,6 @@
 
 <img width="1328" height="1007" alt="截图 2026-07-24 15-25-48" src="https://github.com/user-attachments/assets/f4ee0347-5003-4ed0-880e-f881caf34a2c" />
 
-<img width="1355" height="845" alt="image" src="https://github.com/user-attachments/assets/eaab7efe-8e1d-406d-8ea0-693c953846e0" />
-
-
 ## 文件
 
 | 文件 | 说明 |
@@ -123,3 +120,13 @@ http://127.0.0.1:8649
 - **加快捷指令**：在欢迎屏 `.examples` 区加 `.ex-card`
 - **改 hermes 命令参数**：编辑 `server.py` 的 `run_hermes` 函数里的 `cmd` 列表（如加 `--max-turns`、改 model 等）
 - **用其他 profile**：⚙️ 设置里改 Agent Profile（如 `default`）
+
+## 其他截图
+
+<img width="1355" height="845" alt="image" src="https://github.com/user-attachments/assets/eaab7efe-8e1d-406d-8ea0-693c953846e0" />
+
+<img width="1328" height="1007" alt="截图 2026-07-24 15-48-14" src="https://github.com/user-attachments/assets/b33c998f-2ba9-46b9-81b0-e69ee273e9ed" />
+
+<img width="1328" height="1007" alt="截图 2026-07-24 15-48-54" src="https://github.com/user-attachments/assets/5c8a0723-5486-4b8b-85ed-9963d9513254" />
+
+<img width="1328" height="1007" alt="截图 2026-07-24 15-51-58" src="https://github.com/user-attachments/assets/a6a2139e-13de-4bff-aa0f-3af00d2fc9ef" />
