@@ -4,6 +4,9 @@
 
 <img width="1328" height="1007" alt="截图 2026-07-24 15-25-48" src="https://github.com/user-attachments/assets/f4ee0347-5003-4ed0-880e-f881caf34a2c" />
 
+<img width="1355" height="845" alt="image" src="https://github.com/user-attachments/assets/eaab7efe-8e1d-406d-8ea0-693c953846e0" />
+
+
 ## 文件
 
 | 文件 | 说明 |
