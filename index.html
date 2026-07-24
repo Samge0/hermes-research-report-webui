@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Report · 研报洞察</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%235b8cff'/><stop offset='.5' stop-color='%238b5cf6'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><rect width='64' height='64' rx='14' fill='url(%23g)'/><rect x='13' y='34' width='8' height='16' rx='2' fill='%23ffffff'/><rect x='28' y='24' width='8' height='26' rx='2' fill='%23ffffff'/><rect x='43' y='14' width='8' height='36' rx='2' fill='%23ffffff'/></svg>">
+<!-- Markdown 渲染 + 代码高亮（CDN） -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0e1a; --bg-2:#0f1525; --panel:rgba(22,28,46,.72); --panel-solid:#161c2e;
+    --border:rgba(99,118,200,.18); --border-strong:rgba(120,140,220,.32);
+    --text:#e6ecf5; --text-dim:#8a94ad; --text-faint:#5a6480;
+    --brand:#5b8cff; --brand-2:#8b5cf6; --accent:#22d3ee; --success:#34d399; --warn:#fbbf24; --danger:#f87171;
+    --grad:linear-gradient(135deg,#5b8cff 0%,#8b5cf6 50%,#22d3ee 100%);
+    --shadow:0 8px 32px rgba(0,0,0,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);color:var(--text);overflow:hidden;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 20% 0%, rgba(91,140,255,.10), transparent),
+      radial-gradient(ellipse 60% 50% at 80% 100%, rgba(139,92,246,.08), transparent);
+  }
+  /* ===== 顶栏 ===== */
+  header{
+    display:flex;align-items:center;gap:14px;padding:12px 20px;
+    background:var(--panel);backdrop-filter:blur(20px);
+    border-bottom:1px solid var(--border);position:relative;z-index:10;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+  .logo-icon{
+    width:34px;height:34px;border-radius:10px;background:var(--grad);
+    display:flex;align-items:center;justify-content:center;font-size:18px;
+    box-shadow:0 4px 14px rgba(91,140,255,.4);
+  }
+  .logo .sub{font-size:11px;color:var(--text-dim);font-weight:400;margin-left:2px}
+  .spacer{flex:1}
+  .status-pill{
+    display:flex;align-items:center;gap:6px;padding:6px 12px;
+    background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.3);
+    border-radius:999px;font-size:12px;color:var(--success);
+  }
+  .status-pill.busy{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.3);color:var(--warn)}
+  .status-pill.error{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3);color:var(--danger)}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:pulse 1.6s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .icon-btn{
+    width:34px;height:34px;border-radius:9px;border:1px solid var(--border);
+    background:rgba(255,255,255,.03);color:var(--text-dim);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:15px;transition:.2s;
+  }
+  .icon-btn:hover{background:rgba(91,140,255,.15);color:var(--brand);border-color:var(--border-strong)}
+
+  /* ===== 主区 ===== */
+  main{display:flex;height:calc(100vh - 61px)}
+  /* 侧栏 */
+  aside{
+    width:240px;flex-shrink:0;background:var(--panel);backdrop-filter:blur(20px);
+    border-right:1px solid var(--border);display:flex;flex-direction:column;
+  }
+  .new-chat-btn{
+    margin:14px;padding:11px;border:1px solid var(--border-strong);border-radius:11px;
+    background:linear-gradient(135deg,rgba(91,140,255,.18),rgba(139,92,246,.12));
+    color:var(--text);cursor:pointer;font-size:13px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s;
+  }
+  .new-chat-btn:hover{border-color:var(--brand);transform:translateY(-1px)}
+  .sessions{flex:1;overflow-y:auto;padding:0 10px 12px}
+  .sess-label{font-size:10px;color:var(--text-faint);padding:8px 10px 4px;letter-spacing:1px;text-transform:uppercase}
+  .sess-item{
+    padding:9px 11px;border-radius:9px;cursor:pointer;font-size:12.5px;color:var(--text-dim);
+    border:1px solid transparent;display:flex;gap:8px;align-items:center;margin-bottom:2px;transition:.15s;
+  }
+  .sess-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+  .sess-item.active{background:rgba(91,140,255,.14);color:var(--text);border-color:var(--border-strong)}
+  .sess-item .dot{width:6px;height:6px;border-radius:50%;background:var(--brand);flex-shrink:0;opacity:.6}
+  .sess-item.running .dot{background:var(--warn);animation:pulse 1s infinite;opacity:1}
+  .sess-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  /* 对话区 */
+  .chat-area{flex:1;display:flex;flex-direction:column;min-width:0}
+  .chat-header{
+    padding:10px 22px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text-dim);
+    background:rgba(15,21,37,.4);
+  }
+  .chat-header .tag{padding:3px 9px;background:rgba(91,140,255,.14);border-radius:6px;color:var(--brand);font-weight:600;font-size:11px}
+  .messages{flex:1;overflow-y:auto;padding:24px 0;scroll-behavior:smooth}
+  .msg-wrap{max-width:820px;margin:0 auto;padding:0 22px}
+  .msg{display:flex;gap:14px;margin-bottom:24px;animation:fadeUp .4s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .avatar{
+    width:32px;height:32px;border-radius:9px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:15px;
+  }
+  .avatar.user{background:linear-gradient(135deg,#475569,#64748b)}
+  .avatar.bot{background:var(--grad);box-shadow:0 3px 10px rgba(91,140,255,.35)}
+  .avatar.sys{background:linear-gradient(135deg,#f59e0b,#ef4444)}
+  .msg-body{flex:1;min-width:0}
+  .msg-role{font-size:11px;color:var(--text-faint);margin-bottom:4px;font-weight:600;letter-spacing:.5px}
+  .msg-content{font-size:14px;line-height:1.7;color:var(--text);word-wrap:break-word}
+  .msg-content p{margin:6px 0}
+  .msg-content h1,.msg-content h2,.msg-content h3{margin:14px 0 6px;font-weight:600}
+  .msg-content h1{font-size:18px}.msg-content h2{font-size:16px}.msg-content h3{font-size:14px}
+  .msg-content ul,.msg-content ol{margin:6px 0;padding-left:22px}
+  .msg-content code{font-family:"JetBrains Mono",Consolas,monospace;background:rgba(91,140,255,.14);padding:2px 6px;border-radius:5px;font-size:12.5px}
+  .msg-content pre{background:#0d1320;border:1px solid var(--border);border-radius:10px;padding:12px;overflow-x:auto;margin:8px 0}
+  .msg-content pre code{background:none;padding:0;font-size:12px}
+  .msg-content blockquote{border-left:3px solid var(--brand);padding-left:12px;color:var(--text-dim);margin:8px 0}
+  .msg-content a{color:var(--accent)}
+  .msg-content table{border-collapse:collapse;width:100%;margin:8px 0;font-size:12.5px}
+  .msg-content th,.msg-content td{border:1px solid var(--border);padding:6px 9px;text-align:left}
+  .msg-content th{background:rgba(91,140,255,.1)}
+
+  /* 进度行（流式推送的工具调用/diff/思考） */
+  .progress-line{
+    padding:5px 0;font-size:12.5px;color:var(--text-dim);line-height:1.5;
+    font-family:"JetBrains Mono",Consolas,monospace;
+    animation:fadeIn .3s ease;
+  }
+  .progress-line.tool{color:var(--accent)}
+  .progress-line.diff{color:var(--success);font-size:11.5px;white-space:pre-wrap}
+  .progress-line.narration{white-space:pre-wrap;color:var(--text)}
+  @keyframes fadeIn{from{opacity:.5}to{opacity:1}}
+
+  /* 思考过程折叠块 */
+  .thinking-block{margin:6px 0 12px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.02);overflow:hidden}
+  .thinking-block summary{
+    cursor:pointer;padding:9px 13px;font-size:12px;color:var(--text-dim);user-select:none;
+    list-style:none;display:flex;align-items:center;gap:7px;transition:.15s;
+  }
+  .thinking-block summary::-webkit-details-marker{display:none}
+  .thinking-block summary::before{content:"▾";font-size:10px;color:var(--text-faint);transition:transform .2s}
+  .thinking-block:not([open]) summary::before{transform:rotate(-90deg)}
+  .thinking-block summary:hover{color:var(--text);background:rgba(91,140,255,.05)}
+  .thinking-block[open] summary{border-bottom:1px solid var(--border)}
+  .thinking-block .progress-area{padding:8px 13px;max-height:360px;overflow-y:auto}
+  .thinking-block .step-count{color:var(--brand);font-weight:600}
+  /* 叙述气泡：Agent 的小阶段思考小结，逐条渐进冒出（微信式） */
+  .narration-area{display:flex;flex-direction:column;gap:8px;margin:6px 0 12px}
+  .bubble{
+    align-self:flex-start;max-width:90%;padding:9px 14px;
+    border-radius:14px 14px 14px 4px;
+    background:linear-gradient(135deg,rgba(91,140,255,.12),rgba(139,92,246,.08));
+    border:1px solid rgba(91,140,255,.24);color:var(--text);
+    font-size:13.5px;line-height:1.65;animation:fadeUp .3s ease;
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
+  }
+  .bubble p{margin:0}.bubble p+p{margin-top:6px}
+  .bubble code{font-family:"JetBrains Mono",Consolas,monospace;background:rgba(91,140,255,.18);padding:1px 5px;border-radius:4px;font-size:12px}
+  .bubble strong{color:#fff}
+  /* 最终完整回复折叠块 */
+  .final-reply{margin:6px 0 4px;border:1px solid var(--border);border-radius:11px;background:rgba(255,255,255,.02);overflow:hidden}
+  .final-reply summary{cursor:pointer;padding:9px 13px;font-size:12.5px;color:var(--text-dim);list-style:none;display:flex;align-items:center;gap:7px;user-select:none}
+  .final-reply summary::-webkit-details-marker{display:none}
+  .final-reply summary::before{content:"▾";font-size:10px;color:var(--text-faint);transition:transform .2s}
+  .final-reply:not([open]) summary::before{transform:rotate(-90deg)}
+  .final-reply[open] summary{border-bottom:1px solid var(--border)}
+  .final-reply-body{padding:10px 14px}
+  .final-reply-body h1,.final-reply-body h2,.final-reply-body h3{margin:12px 0 6px;font-weight:600}
+  .final-reply-body h1{font-size:17px}.final-reply-body h2{font-size:15px}.final-reply-body h3{font-size:13.5px}
+  .final-reply-body p{margin:6px 0;line-height:1.7}
+  .final-reply-body ul,.final-reply-body ol{margin:6px 0;padding-left:22px}
+  .final-reply-body li{margin:3px 0}
+  /* 报告目录入口 */
+  .report-dir-link{margin-top:12px}
+  .report-dir-link a{
+    display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border:1px solid var(--border-strong);
+    border-radius:10px;color:var(--accent);text-decoration:none;font-size:12.5px;font-weight:600;transition:.15s;
+  }
+  .report-dir-link a:hover{background:rgba(91,140,255,.12);border-color:var(--brand);transform:translateX(2px)}
+  /* 右下角错误提示（可恢复时让用户选择继续会话） */
+  .toast{position:fixed;right:20px;bottom:20px;z-index:60;display:flex;gap:12px;align-items:flex-start;
+    max-width:380px;padding:14px 16px;border-radius:13px;background:var(--panel-solid);
+    border:1px solid rgba(251,191,36,.45);box-shadow:0 12px 40px rgba(0,0,0,.55);animation:fadeUp .3s}
+  .toast-icon{font-size:22px;line-height:1.2}
+  .toast-body{flex:1;min-width:0}
+  .toast-title{font-weight:700;color:var(--text);font-size:13.5px;margin-bottom:3px}
+  .toast-msg{font-size:12px;color:var(--text-dim);line-height:1.55;margin-bottom:11px;word-break:break-word;max-height:130px;overflow:auto;white-space:pre-wrap}
+  .toast-actions{display:flex;gap:8px}
+  .toast-btn{padding:7px 13px;border-radius:8px;border:1px solid var(--border-strong);background:rgba(255,255,255,.04);color:var(--text);font-size:12px;cursor:pointer;font-weight:600;transition:.15s}
+  .toast-btn:hover{border-color:var(--brand)}
+  .toast-btn.primary{background:var(--grad);border-color:transparent}
+
+  /* PDF 链接卡片 */
+  .pdf-card{
+    display:flex;align-items:center;gap:12px;padding:14px;margin:10px 0;
+    background:linear-gradient(135deg,rgba(248,113,113,.10),rgba(251,191,36,.06));
+    border:1px solid rgba(248,113,113,.3);border-radius:12px;text-decoration:none;transition:.2s;
+  }
+  .pdf-card:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .pdf-icon{font-size:28px}
+  .pdf-meta .pt{font-weight:700;color:var(--text)}
+  .pdf-meta .ps{font-size:11px;color:var(--text-dim);font-family:monospace;word-break:break-all}
+
+  /* 打字机光标 */
+  .cursor::after{content:"▍";color:var(--brand);animation:blink 1s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+  /* 思考中占位 */
+  .thinking{display:flex;gap:6px;padding:8px 0}
+  .thinking span{width:7px;height:7px;border-radius:50%;background:var(--brand);animation:bounce 1.4s infinite}
+  .thinking span:nth-child(2){animation-delay:.2s}
+  .thinking span:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-7px);opacity:1}}
+
+  /* ===== 底部输入 ===== */
+  .composer-wrap{padding:14px 22px 18px;background:linear-gradient(to top,var(--bg) 60%,transparent)}
+  .composer{
+    max-width:820px;margin:0 auto;background:var(--panel);backdrop-filter:blur(20px);
+    border:1px solid var(--border-strong);border-radius:18px;padding:6px 6px 6px 16px;
+    display:flex;align-items:flex-end;gap:8px;transition:.2s;
+  }
+  .composer:focus-within{border-color:var(--brand);box-shadow:0 0 0 3px rgba(91,140,255,.15)}
+  .composer textarea{
+    flex:1;background:transparent;border:none;outline:none;resize:none;color:var(--text);
+    font-family:inherit;font-size:14px;line-height:1.5;padding:10px 0;max-height:160px;min-height:24px;
+  }
+  .composer textarea::placeholder{color:var(--text-faint)}
+  .send-btn{
+    width:38px;height:38px;border-radius:12px;border:none;cursor:pointer;
+    background:var(--grad);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;
+    transition:.2s;flex-shrink:0;
+  }
+  .send-btn:hover{transform:scale(1.06);box-shadow:0 4px 16px rgba(91,140,255,.5)}
+  .send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .send-btn.stop{background:linear-gradient(135deg,#f87171,#ef4444)}
+  .composer-tools{display:flex;gap:6px;padding-bottom:4px}
+  .ct-btn{padding:5px 9px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:11px;cursor:pointer;transition:.15s}
+  .ct-btn:hover{color:var(--brand);border-color:var(--border-strong)}
+  .ct-btn.active{background:rgba(91,140,255,.15);color:var(--brand);border-color:var(--brand)}
+
+  /* ===== 设置抽屉 ===== */
+  .drawer-mask{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:50;opacity:0;pointer-events:none;transition:.3s}
+  .drawer-mask.open{opacity:1;pointer-events:auto}
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;width:380px;max-width:90vw;background:var(--bg-2);
+    border-left:1px solid var(--border);z-index:51;transform:translateX(100%);transition:.3s;
+    overflow-y:auto;padding:24px;
+  }
+  .drawer.open{transform:none}
+  .drawer h3{font-size:15px;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:6px;letter-spacing:.5px;font-weight:600}
+  .field input,.field select,.field textarea{
+    width:100%;padding:10px 12px;background:var(--panel-solid);border:1px solid var(--border);
+    border-radius:9px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:.15s;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--brand)}
+  .field .hint{font-size:10px;color:var(--text-faint);margin-top:4px}
+  .field textarea{resize:vertical;min-height:60px;font-family:monospace;font-size:11px}
+  .drawer-actions{display:flex;gap:8px;margin-top:20px}
+  .drawer-actions button{flex:1;padding:10px;border-radius:9px;border:1px solid var(--border-strong);background:rgba(255,255,255,.04);color:var(--text);cursor:pointer;font-size:13px;font-weight:600}
+  .drawer-actions button.primary{background:var(--grad);border-color:transparent}
+
+  /* 欢迎屏 */
+  .welcome{max-width:680px;margin:auto;padding:40px 22px;text-align:center}
+  .welcome .big-icon{font-size:56px;margin-bottom:16px}
+  .welcome h1{font-size:26px;font-weight:700;margin-bottom:8px;background:var(--grad);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .welcome p{color:var(--text-dim);font-size:14px;line-height:1.7;margin-bottom:24px}
+  .examples{display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left}
+  .ex-card{padding:14px;background:var(--panel);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:.2s;font-size:12.5px;color:var(--text-dim)}
+  .ex-card:hover{border-color:var(--brand);color:var(--text);transform:translateY(-2px)}
+  .ex-card .et{color:var(--text);font-weight:600;margin-bottom:3px;font-size:13px}
+
+  /* 滚动条 */
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:rgba(120,140,220,.2);border-radius:4px}
+  ::-webkit-scrollbar-thumb:hover{background:rgba(120,140,220,.35)}
+
+  .empty-msg{text-align:center;color:var(--text-faint);font-size:12px;padding:30px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">📊</div>
+    <div>Research Report<div class="sub">研报洞察 · 研究报告分析师</div></div>
+  </div>
+  <div class="spacer"></div>
+  <div id="statusPill" class="status-pill"><span class="status-dot"></span><span id="statusText">就绪</span></div>
+  <button class="icon-btn" onclick="drawer.open()" title="设置">⚙️</button>
+</header>
+
+<main>
+  <aside>
+    <button class="new-chat-btn" onclick="newChat()">＋ 新建报告任务</button>
+    <div class="sessions" id="sessionsList">
+      <div class="sess-label">最近的任务</div>
+      <div class="empty-msg">暂无任务</div>
+    </div>
+  </aside>
+
+  <div class="chat-area">
+    <div class="chat-header">
+      <span class="tag" id="hdrProfile">hermes-research-report-agent</span>
+      <span id="hdrInfo">就绪 · 输入主题开始生成研究报告</span>
+    </div>
+
+    <div class="messages" id="messages">
+      <div class="welcome">
+        <div class="big-icon">📈</div>
+        <h1>研报洞察 Research Report</h1>
+        <p>输入任意主题、行业或方案，Agent 会自动多源采集数据、多维度打分评估，生成结构化 PDF 研究报告。<br>支持行业研究、方案对比、市场前景评估。</p>
+        <div class="examples">
+          <div class="ex-card" onclick="useExample(this)"><div class="et">📊 行业研究</div>做一份关于「人形机器人行业」的研究报告，全球视角，输出 PDF</div>
+          <div class="ex-card" onclick="useExample(this)"><div class="et">⚖️ 方案对比</div>对比分析 React 和 Vue 两个前端框架并打分，输出 PDF</div>
+          <div class="ex-card" onclick="useExample(this)"><div class="et">🚀 市场前景</div>评估「固态电池」的市场前景并导出 PDF 报告</div>
+          <div class="ex-card" onclick="useExample(this)"><div class="et">🔬 主题研究</div>做一份关于「RISC-V 芯片生态」的研究报告</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="composer-wrap">
+      <div class="composer">
+        <textarea id="input" rows="1" placeholder="描述你要研究的主题…  (Enter 发送 / Shift+Enter 换行)"></textarea>
+        <div class="composer-tools">
+          <button class="ct-btn" id="skipAskBtn" onclick="toggleSkipAsk(this)" title="跳过 clarify 交互问答">⚡ 免交互</button>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="send()" title="发送">➤</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- 设置抽屉 -->
+<div class="drawer-mask" id="mask" onclick="drawer.close()"></div>
+<div class="drawer" id="drawer">
+  <h3>⚙️ 连接设置</h3>
+  <div class="field">
+    <label>服务地址</label>
+    <input id="cfgEndpoint" placeholder="http://127.0.0.1:8649">
+    <div class="hint">Research Report 独立服务地址（先启动 server.py）</div>
+  </div>
+  <div class="field">
+    <label>Agent Profile</label>
+    <input id="cfgProfile" placeholder="hermes-research-report-agent">
+    <div class="hint">使用哪个 Agent 角色（hermes-research-report-agent / default / 自建 profile）</div>
+  </div>
+  <div class="field">
+    <label>额外指令 (instructions)</label>
+    <textarea id="cfgInstructions" rows="2" placeholder="直接执行，跳过交互问答"></textarea>
+    <div class="hint">叠加在 Agent 系统提示之上的额外指令</div>
+  </div>
+  <div class="drawer-actions">
+    <button onclick="drawer.close()">取消</button>
+    <button class="primary" onclick="saveCfg()">保存</button>
+  </div>
+</div>
+
+<!-- 右下角错误提示（API 失败后可继续会话） -->
+<div class="toast" id="errToast" style="display:none">
+  <div class="toast-icon">⚠️</div>
+  <div class="toast-body">
+    <div class="toast-title">任务中断 · API 调用失败</div>
+    <div class="toast-msg" id="toastMsg"></div>
+    <div class="toast-actions">
+      <button class="toast-btn primary" onclick="resumeTask()">🔄 继续会话</button>
+      <button class="toast-btn" onclick="closeToast(true)">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   Research Report Web UI · 单文件前端
+   核心：POST /api/run 启动任务 + EventSource SSE 实时进度
+   后端：独立 Python 服务 (server.py)，subprocess 调用 hermes chat
+   ============================================================ */
+
+const $ = id => document.getElementById(id);
+const STORE_KEY = 'reportSageUI';
+
+// ===== 配置持久化（localStorage 在 file:// 下可能被禁用，需 try/catch + 内存回退）=====
+const defaultCfg = {
+  endpoint: 'http://127.0.0.1:8649',
+  profile: 'hermes-research-report-agent',
+  instructions: '直接执行，跳过交互问答',
+  skipAsk: true,
+};
+
+const memStore = {};
+const storage = {
+  available: (() => {
+    try { localStorage.setItem('_probe','1'); localStorage.removeItem('_probe'); return true; }
+    catch { return false; }
+  })(),
+  get(key){
+    try { return this.available ? localStorage.getItem(key) : memStore[key] ?? null; }
+    catch { return memStore[key] ?? null; }
+  },
+  set(key, val){
+    try { if (this.available) localStorage.setItem(key, val); else memStore[key] = val; return true; }
+    catch { memStore[key] = val; return false; }
+  },
+};
+
+let cfg = {...defaultCfg, ...(() => {
+  try { return JSON.parse(storage.get(STORE_KEY) || '{}'); } catch { return {}; }
+})()};
+function saveCfgStore(){ storage.set(STORE_KEY, JSON.stringify(cfg)); }
+
+// ===== 状态 =====
+let running = false;
+let currentTaskId = null;
+let eventSource = null;
+let progressCount = 0;       // 已展示的非空进度数（用于步数显示）
+let streamSince = 0;         // 已接收的 progress 事件数（=服务端 progress 数组游标，用于重连/恢复）
+let currentEls = null;       // 当前流式消息的 DOM 引用（恢复会话时复用）
+let recovering = false;      // 处于“可恢复错误”等待用户决策中（忽略期间的原生连接错误）
+
+// ===== marked 配置 =====
+if (window.marked) marked.setOptions({breaks:true,gfm:true});
+function renderMd(md){
+  if (!window.marked) return String(md||'').replace(/</g,'&lt;');
+  let src = String(md || '');
+  // ⚠ 关键修复：Agent 喜欢用 ====== 做装饰分隔线。marked 会把“文本行紧跟一整行 ===/---”
+  //   误判为 setext 标题(h1/h2)，导致整篇报告每段都变成巨型 <h1>（字体错乱）。
+  //   这里把纯 = / - / _ 装饰行改写成独立的水平分隔线，并在前面插入空行，打断 setext 邻接。
+  src = src.replace(/^[ \t]*([=\-_]{3,})[ \t]*$/gm, '\n\n---\n');
+  return DOMPurify.sanitize(marked.parse(src));
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+// ===== 状态指示 =====
+function setStatus(text, kind='ok'){
+  const pill = $('statusPill'), t = $('statusText');
+  pill.className = 'status-pill' + (kind==='busy'?' busy':kind==='error'?' error':'');
+  t.textContent = text;
+  $('hdrInfo').textContent = kind==='busy' ? '执行中 · Agent 正在工作…' : text;
+}
+
+// ===== 消息渲染 =====
+function scrollBottom(){ const m=$('messages'); m.scrollTop = m.scrollHeight; }
+
+function addMsg(role, content, opts={}){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  const isUser = role==='user';
+  const avatarCls = isUser?'user':role==='system'?'sys':'bot';
+  const avatarIcon = isUser?'🧑':role==='system'?'⚠️':'📊';
+  const roleLabel = isUser?'你':role==='system'?'系统':'Research Report';
+  const contentHtml = opts.html !== undefined ? opts.html : `<div class="msg-content">${typeof content==='string'?renderMd(content):''}</div>`;
+  wrap.innerHTML = `
+    <div class="msg">
+      <div class="avatar ${avatarCls}">${avatarIcon}</div>
+      <div class="msg-body">
+        <div class="msg-role">${roleLabel}</div>
+        ${contentHtml}
+      </div>
+    </div>`;
+  $('messages').appendChild(wrap);
+  scrollBottom();
+  return wrap.querySelector('.msg-body');
+}
+
+// 创建一个带进度区的 bot 消息（流式时用）
+function addStreamingMsg(){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.innerHTML = `
+    <div class="msg">
+      <div class="avatar bot">📊</div>
+      <div class="msg-body">
+        <div class="msg-role">Research Report</div>
+        <div class="narration-area"></div>
+        <details class="thinking-block" open>
+          <summary>🧠 详细思考过程 · <span class="step-count">0</span> 步</summary>
+          <div class="progress-area"></div>
+        </details>
+        <div class="final-text"></div>
+      </div>
+    </div>`;
+  $('messages').appendChild(wrap);
+  scrollBottom();
+  return {
+    narrationArea: wrap.querySelector('.narration-area'),
+    thinkingBlock: wrap.querySelector('.thinking-block'),
+    progressArea: wrap.querySelector('.progress-area'),
+    finalText: wrap.querySelector('.final-text'),
+    stepCount: wrap.querySelector('.step-count'),
+  };
+}
+
+function addThinking(){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.innerHTML = `
+    <div class="msg">
+      <div class="avatar bot">📊</div>
+      <div class="msg-body">
+        <div class="msg-role">Research Report</div>
+        <div class="thinking"><span></span><span></span><span></span></div>
+      </div>
+    </div>`;
+  $('messages').appendChild(wrap);
+  scrollBottom();
+  return wrap.querySelector('.msg-body');
+}
+
+// 把本地报告路径映射成服务端可预览 URL（仅 report/ 目录下的产物）
+function reportUrl(path){
+  const m = String(path).match(/\/report\/(.+)$/i);
+  return m ? (cfg.endpoint + '/report/' + m[1]) : null;
+}
+
+// 装饰本地路径为可点击预览链接（PDF/HTML 在浏览器内联预览）
+function decorateLinks(node){
+  if (!node) return;
+  const fileRe = /((?:\/[\w.\-]+)+\.(?:pdf|docx?|xlsx?|html?|png|jpe?g|gif|svg|mp4|json|csv))/gi;
+  const walk = nd => {
+      nd.childNodes.forEach(child => {
+        if (child.nodeType === 3){
+          const text = child.textContent;
+          fileRe.lastIndex = 0;
+          if (!fileRe.test(text)) return;
+          fileRe.lastIndex = 0;
+          const frag = document.createDocumentFragment();
+          let last = 0, m;
+          while ((m = fileRe.exec(text))){
+            frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+            const path = m[1];
+            const name = path.split('/').pop();
+            const lower = name.toLowerCase();
+            const icon = lower.endsWith('.pdf') ? '📕' :
+                         lower.endsWith(('.html')) ? '🌐' :
+                         /\.(png|jpe?g|gif|svg)$/.test(lower) ? '🖼️' : '📄';
+            const url = reportUrl(path);
+            const a = document.createElement('a');
+            a.href = url || ('file://' + path);
+            a.target = '_blank';
+            a.className = 'pdf-card';
+            a.innerHTML = `<span class="pdf-icon">${icon}</span><div class="pdf-meta">` +
+              `<div class="pt">${escapeHtml(name)}${url ? ' · 点击预览' : ''}</div>` +
+              `<div class="ps">${escapeHtml(path)}</div></div>`;
+            frag.appendChild(a);
+            last = m.index + m[0].length;
+          }
+          if (last > 0){
+            frag.appendChild(document.createTextNode(text.slice(last)));
+            nd.replaceChild(frag, child);
+          }
+        }
+      });
+  };
+  // 处理 node 自身（若它是文本容器）+ 所有 .msg-content/.final-text 后代
+  const targets = [];
+  if (node.classList && (node.classList.contains('msg-content') || node.classList.contains('final-text'))) targets.push(node);
+  node.querySelectorAll('.msg-content, .final-text').forEach(el => targets.push(el));
+  targets.forEach(walk);
+}
+
+// 把一条 progress 事件追加到 气泡区 + 详细思考区；返回是否计入步数（非空内容才计）
+function appendProgress(narrationArea, progressArea, data){
+  if (!data) return false;
+  if ((data.kind || 'text') === 'text'){
+    const t = (data.text || '').replace(/[\u200B\u00A0\uFEFF]/g, '').trim();  // 去零宽/不间断空格再 trim
+    if (!t) return false;  // 空内容过滤
+    const html = renderMd(t);
+    const probe = document.createElement('div');
+    probe.innerHTML = html;
+    if (!probe.textContent.trim()) return false;  // 渲染后无可见文本（纯 markdown 标记等）也过滤
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = html;
+    if (narrationArea) narrationArea.appendChild(bubble);
+    const line = document.createElement('div');
+    line.className = 'progress-line text narration';
+    line.textContent = '\n' + t;
+    if (progressArea) progressArea.appendChild(line);
+  } else {
+    const line = document.createElement('div');
+    line.className = 'progress-line ' + (data.kind || 'text');
+    line.textContent = data.text;
+    if (progressArea) progressArea.appendChild(line);
+  }
+  return true;
+}
+
+// ===== 核心发送（POST /api/run + EventSource SSE 流）=====
+async function send(){
+  const input = $('input');
+  const text = input.value.trim();
+  if (!text || running) return;
+  input.value = '';
+  input.style.height = 'auto';
+  adjustSendBtn();
+  // 有活动会话则继续该会话（hermes --resume），否则开新任务
+  if (currentTaskId) continueTask(currentTaskId, text);
+  else startNewTask(text);
+}
+
+// 开启新任务（新 hermes 会话）
+async function startNewTask(text){
+  running = true;
+  setStatus('执行中 · Agent 正在工作…','busy');
+  addMsg('user', text);
+
+  // 构造 instructions
+  let instructions = cfg.instructions || '';
+  if (cfg.skipAsk && !instructions.toLowerCase().includes('跳过')) {
+    instructions = (instructions + ' 跳过 clarify 交互问答，按用户已给信息直接执行。').trim();
+  }
+
+  // 启动任务
+  let taskId;
+  try {
+    const resp = await fetch(cfg.endpoint + '/api/run', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ query: text, profile: cfg.profile, instructions: instructions || undefined }),
+    });
+    const data = await resp.json();
+    if (!resp.ok || !data.task_id) throw new Error(data.error || '启动任务失败');
+    taskId = data.task_id;
+    currentTaskId = taskId;
+    loadTasks();  // 侧栏立刻显示这条进行中的任务
+  } catch(e){
+    addMsg('system', `❌ 无法连接服务：${e.message}\n请确认 server.py 已启动（http://127.0.0.1:8649）`);
+    setStatus('服务连接失败','error');
+    running = false;
+    adjustSendBtn();
+    return;
+  }
+
+  // 切换发送键为停止键
+  $('sendBtn').classList.add('stop');
+  $('sendBtn').textContent = '⏹';
+
+  // 建立流式消息区并连接 SSE（后端独立运行，前端仅展示；刷新后会自动重连）
+  const els = addStreamingMsg();
+  progressCount = 0;
+  streamSince = 0;
+  attachStream(taskId, 0, els);
+}
+
+// 继续当前会话（hermes --resume <session_id> + 用户输入），不新建任务、不新增侧栏
+async function continueTask(taskId, text){
+  running = true;
+  setStatus('执行中 · 继续会话…','busy');
+  addMsg('user', text);
+  $('sendBtn').classList.add('stop');
+  $('sendBtn').textContent = '⏹';
+  const els = addStreamingMsg();
+  progressCount = 0;
+  try {
+    const r = await fetch(cfg.endpoint + '/api/resume/' + taskId, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ prompt: text }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || '恢复失败');
+    streamSince = (typeof d.since === 'number') ? d.since : streamSince;
+  } catch(e){
+    els.finalText.innerHTML = `<div style="color:var(--danger)">❌ 继续会话失败：${escapeHtml(e.message)}</div>`;
+    setStatus('继续失败','error');
+    running = false;
+    adjustSendBtn();
+    return;
+  }
+  attachStream(taskId, streamSince, els);
+}
+
+// 连接 SSE：从 since 游标推送 progress，终态推 done/error。send 与刷新重连共用同一份渲染逻辑。
+function attachStream(taskId, since, els){
+  const { narrationArea, thinkingBlock, progressArea, finalText, stepCount } = els;
+  currentEls = els;
+  recovering = false;
+  eventSource = new EventSource(cfg.endpoint + '/api/stream/' + taskId + '?since=' + since);
+
+  eventSource.addEventListener('progress', (e) => {
+    streamSince++;
+    const data = JSON.parse(e.data);
+    if (appendProgress(narrationArea, progressArea, data)){
+      progressCount++;
+      if (stepCount) stepCount.textContent = progressCount;
+    }
+    scrollBottom();
+  });
+
+  eventSource.addEventListener('done', (e) => {
+    const data = JSON.parse(e.data);
+    const finalOutput = data.text || '';
+    if (thinkingBlock){
+      thinkingBlock.open = false;
+      const sum = thinkingBlock.querySelector('summary');
+      if (sum) sum.innerHTML = `🧠 详细思考过程 · 已折叠（${progressCount} 步，点击展开）`;
+    }
+    if (finalOutput){
+      finalText.innerHTML = '';
+      const det = document.createElement('details');
+      det.className = 'final-reply';
+      const sum = document.createElement('summary');
+      sum.textContent = '📝 完整回复 · 核心结论与评分（点击展开）';
+      const body = document.createElement('div');
+      body.className = 'final-reply-body';
+      body.innerHTML = renderMd(finalOutput);
+      det.appendChild(sum);
+      det.appendChild(body);
+      finalText.appendChild(det);
+      decorateLinks(finalText);
+    } else {
+      finalText.innerHTML = '<div style="color:var(--text-dim)">（Agent 已完成，无文本输出）</div>';
+    }
+    {
+      const tdir = document.createElement('div');
+      tdir.className = 'report-dir-link';
+      tdir.innerHTML = `<a href="${cfg.endpoint}/report/${taskId}/" target="_blank">📁 打开本任务报告目录 →</a> <a href="${cfg.endpoint}/report/" target="_blank" style="font-size:11px;color:var(--text-dim)">全部报告</a>`;
+      finalText.appendChild(tdir);
+    }
+    scrollBottom();
+    setStatus('完成 · 报告已生成','ok');
+    cleanup();
+  });
+
+  eventSource.addEventListener('error', (e) => {
+    if (e.data){
+      const data = JSON.parse(e.data);
+      if (data.recoverable){
+        // 可恢复：保留任务与 DOM，弹右下角 toast 让用户选择继续/关闭
+        recovering = true;
+        if (eventSource){ eventSource.close(); eventSource = null; }
+        finalText.innerHTML = `<div style="color:var(--warn)">⚠️ ${escapeHtml(data.text)}（可在右下角点「继续会话」恢复）</div>`;
+        showErrorToast(data.text);
+        setStatus('中断 · 可继续','error');
+        return;  // 不 cleanup：保留 currentTaskId/currentEls/streamSince 供 resume
+      }
+      finalText.innerHTML = `<div style="color:var(--danger)">❌ ${escapeHtml(data.text)}</div>`;
+      setStatus('出错','error'); cleanup(); return;
+    }
+    // 无 data：原生连接错误。恢复等待期忽略；仅在彻底关闭且非恢复态时清理。
+    if (recovering) return;
+    if (eventSource && eventSource.readyState === EventSource.CLOSED){
+      finalText.innerHTML = `<div style="color:var(--danger)">❌ 连接中断</div>`;
+      setStatus('连接中断','error'); cleanup();
+    }
+  });
+}
+
+// 终结后清理：关 SSE、复位运行态；保留 currentTaskId 以便继续会话
+function cleanup(){
+  if (eventSource) eventSource.close();
+  eventSource = null;
+  running = false;
+  currentEls = null;
+  recovering = false;
+  $('sendBtn').classList.remove('stop');
+  $('sendBtn').textContent = '➤';
+  adjustSendBtn();
+  loadTasks();
+}
+
+// ===== 失败恢复：右下角 toast + 用 hermes --resume 继续会话 =====
+function showErrorToast(msg){
+  $('toastMsg').textContent = (msg || 'Agent 执行遇到错误。') + '\n\n点「继续会话」即可用 hermes --resume 恢复本次会话，从中断处接着做。';
+  $('errToast').style.display = 'flex';
+}
+function closeToast(dismissed){
+  $('errToast').style.display = 'none';
+  if (dismissed){
+    // 用户放弃恢复 → 正式收尾为失败状态
+    recovering = false;
+    if (eventSource){ eventSource.close(); eventSource = null; }
+    running = false; currentTaskId = null; currentEls = null;
+    $('sendBtn').classList.remove('stop'); $('sendBtn').textContent = '➤'; adjustSendBtn();
+    loadTasks();
+  }
+}
+async function resumeTask(){
+  const tid = currentTaskId;
+  if (!tid){ closeToast(false); return; }
+  closeToast(false);
+  try {
+    const r = await fetch(cfg.endpoint + '/api/resume/' + tid, {method:'POST', headers:{'Content-Type':'application/json'}, body:'{}'});
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || '恢复失败');
+  } catch(e){
+    showErrorToast('❌ 恢复失败：' + e.message);
+    setStatus('恢复失败','error');
+    return;
+  }
+  // 复用原消息区：清掉错误提示，从当前游标重连 SSE 续看恢复后的进度
+  if (currentEls && currentEls.finalText) currentEls.finalText.innerHTML = '';
+  running = true;
+  setStatus('执行中 · 已恢复会话，继续工作…','busy');
+  $('sendBtn').classList.add('stop'); $('sendBtn').textContent = '⏹';
+  attachStream(tid, streamSince, currentEls);
+}
+
+// 页面加载/刷新时：若后端仍有执行中的任务，自动重连恢复展示（刷新不丢任务与状态）
+async function reconnectIfRunning(){
+  let tasks = [];
+  try { tasks = (await (await fetch(cfg.endpoint + '/api/tasks')).json()).tasks || []; }
+  catch(e){ return; }
+  const rtask = tasks.find(t => t.status === 'running' || t.status === 'pending');
+  if (!rtask) return;
+  let d;
+  try { d = await (await fetch(cfg.endpoint + '/api/task/' + rtask.task_id)).json(); }
+  catch(e){ return; }
+  // 刷新期间任务可能已结束 → 直接按历史渲染
+  if (d.status === 'completed' || d.status === 'error' || d.status === 'cancelled'){
+    showCompletedTask(d.query || '(无标题)', d.output || '', d.status, rtask.task_id, d.progress);
+    return;
+  }
+  // 仍在运行：清屏 → 重放已有 progress → 从游标重连 SSE 续看
+  $('messages').innerHTML = '';
+  addMsg('user', d.query || '(无标题)');
+  const els = addStreamingMsg();
+  progressCount = 0;
+  (d.progress || []).forEach(data => { if (appendProgress(els.narrationArea, els.progressArea, data)) progressCount++; });
+  if (els.stepCount) els.stepCount.textContent = progressCount;
+  running = true;
+  currentTaskId = rtask.task_id;
+  streamSince = (d.progress || []).length;
+  loadTasks();  // 侧栏高亮重连的会话
+  setStatus('执行中 · Agent 正在工作…（已重连）','busy');
+  $('sendBtn').classList.add('stop');
+  $('sendBtn').textContent = '⏹';
+  attachStream(rtask.task_id, streamSince, els);
+}
+
+// 停止当前任务
+async function stopTask(){
+  if (!currentTaskId) return;
+  try {
+    await fetch(cfg.endpoint + '/api/stop/' + currentTaskId, {method:'POST'});
+  } catch{}
+  if (eventSource) eventSource.close();
+}
+
+// ===== 最近任务列表（来自后端 /api/tasks，跨标签/重启可见）=====
+const STATUS_ICON = {pending:'⏳', running:'🔄', completed:'✅', error:'❌', cancelled:'⏹'};
+
+async function loadTasks(){
+  const list = $('sessionsList');
+  let tasks = [];
+  try {
+    const r = await fetch(cfg.endpoint + '/api/tasks');
+    const d = await r.json();
+    tasks = d.tasks || [];
+  } catch(e){
+    list.innerHTML = '<div class="sess-label">最近的任务</div><div class="empty-msg">无法连接服务</div>';
+    return;
+  }
+  list.innerHTML = '<div class="sess-label">最近的任务</div>';
+  if (!tasks.length){
+    list.innerHTML += '<div class="empty-msg">暂无任务</div>';
+    return;
+  }
+  tasks.forEach(t => {
+    const div = document.createElement('div');
+    const live = (t.status === 'running' || t.status === 'pending');
+    div.className = 'sess-item' + (live ? ' running' : '') + (t.task_id === currentTaskId ? ' active' : '');
+    const ts = t.created_at
+      ? new Date(t.created_at * 1000).toLocaleString('zh-CN', {month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})
+      : '';
+    const icon = STATUS_ICON[t.status] || '•';
+    div.title = t.query || '';
+    div.innerHTML = `<span class="dot"></span><span class="sess-title">${escapeHtml(t.query || '(无标题)')}</span><span style="font-size:10px;color:var(--text-faint);margin-left:auto;white-space:nowrap">${icon} ${ts}</span>`;
+    div.onclick = ()=> loadTaskDetail(t.task_id);
+    list.appendChild(div);
+  });
+}
+
+async function loadTaskDetail(taskId){
+  if (running) return;
+  let d;
+  try {
+    const r = await fetch(cfg.endpoint + '/api/task/' + taskId);
+    d = await r.json();
+    if (!r.ok) throw new Error(d.error || '加载失败');
+  } catch(e){
+    setStatus('加载任务失败：' + e.message, 'error');
+    return;
+  }
+  showCompletedTask(d.query || '(无标题)', d.output || '', d.status, taskId, d.progress);
+  setStatus('已加载历史任务 · ' + (STATUS_ICON[d.status]||'') + ' ' + (d.status||''), 'ok');
+}
+
+// 把单个历史任务渲染成一轮完整对话（用户提问 + Agent 报告正文 + 报告入口）
+function showCompletedTask(query, output, status, taskId, progress){
+  currentTaskId = taskId;  // 点开历史即切换到该会话：后续输入继续此会话而非新建
+  loadTasks();  // 侧栏高亮当前会话
+  $('messages').innerHTML = '';
+  addMsg('user', query);
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap';
+  wrap.innerHTML = `
+    <div class="msg">
+      <div class="avatar bot">📊</div>
+      <div class="msg-body">
+        <div class="msg-role">Research Report · <span style="color:var(--text-faint);font-weight:400">${STATUS_ICON[status]||''} 历史任务</span></div>
+        <div class="narration-area"></div>
+        <details class="thinking-block">
+          <summary>🧠 详细思考过程 · <span class="step-count">0</span> 步</summary>
+          <div class="progress-area"></div>
+        </details>
+        <div class="final-text"></div>
+      </div>
+    </div>`;
+  $('messages').appendChild(wrap);
+  const narrationArea = wrap.querySelector('.narration-area');
+  const progressArea = wrap.querySelector('.progress-area');
+  const finalText = wrap.querySelector('.final-text');
+  const stepCount = wrap.querySelector('.step-count');
+  const tb = wrap.querySelector('.thinking-block');
+  // 重放历史 progress → 气泡 + 详细思考过程
+  let count = 0;
+  (progress || []).forEach(data => { if (appendProgress(narrationArea, progressArea, data)) count++; });
+  if (stepCount) stepCount.textContent = count;
+  if (tb){
+    if (count === 0) tb.style.display = 'none';  // 旧任务无过程数据，隐藏空块
+    else { tb.open = false; const s = tb.querySelector('summary'); if (s) s.innerHTML = `🧠 详细思考过程 · 已折叠（${count} 步，点击展开）`; }
+  }
+  // 最终完整回复（默认折叠，与完成后状态一致）
+  if (output){
+    const det = document.createElement('details');
+    det.className = 'final-reply';
+    const sum = document.createElement('summary');
+    sum.textContent = '📝 完整回复 · 核心结论与评分（点击展开）';
+    const body = document.createElement('div');
+    body.className = 'final-reply-body';
+    body.innerHTML = renderMd(output);
+    det.appendChild(sum); det.appendChild(body);
+    finalText.appendChild(det);
+    decorateLinks(finalText);
+  } else {
+    finalText.innerHTML = '<div style="color:var(--text-dim)">（此任务无文本输出）</div>';
+  }
+  // 本任务报告子目录入口（始终可见）+ 全部报告
+  if (taskId){
+    const tdir = document.createElement('div');
+    tdir.className = 'report-dir-link';
+    tdir.innerHTML = `<a href="${cfg.endpoint}/report/${taskId}/" target="_blank">📁 打开本任务报告目录 →</a> <a href="${cfg.endpoint}/report/" target="_blank" style="font-size:11px;color:var(--text-dim)">全部报告</a>`;
+    finalText.appendChild(tdir);
+  }
+  scrollBottom();
+}
+
+function newChat(){
+  if (running) return;
+  currentTaskId = null;  // 回到欢迎屏：下一次发送将开启新会话
+  streamSince = 0;
+  $('messages').innerHTML = `
+    <div class="welcome">
+      <div class="big-icon">📈</div>
+      <h1>研报洞察 Research Report</h1>
+      <p>输入任意主题、行业或方案，Agent 会自动多源采集数据、多维度打分评估，生成结构化 PDF 研究报告。</p>
+      <div class="examples">
+        <div class="ex-card" onclick="useExample(this)"><div class="et">📊 行业研究</div>做一份关于「人形机器人行业」的研究报告，全球视角，输出 PDF</div>
+        <div class="ex-card" onclick="useExample(this)"><div class="et">⚖️ 方案对比</div>对比分析 React 和 Vue 两个前端框架并打分，输出 PDF</div>
+        <div class="ex-card" onclick="useExample(this)"><div class="et">🚀 市场前景</div>评估「固态电池」的市场前景并导出 PDF 报告</div>
+        <div class="ex-card" onclick="useExample(this)"><div class="et">🔬 主题研究</div>做一份关于「RISC-V 芯片生态」的研究报告</div>
+      </div>
+    </div>`;
+  loadTasks();
+  setStatus('就绪 · 输入主题开始生成研究报告','ok');
+}
+
+// ===== UI 交互 =====
+function useExample(el){
+  $('input').value = el.innerText.split('\n').slice(1).join(' ').trim();
+  adjustSendBtn();
+  $('input').focus();
+}
+function toggleSkipAsk(btn){
+  cfg.skipAsk = !cfg.skipAsk;
+  btn.classList.toggle('active', cfg.skipAsk);
+  saveCfgStore();
+}
+function adjustSendBtn(){
+  const btn = $('sendBtn');
+  if (running){
+    btn.disabled = false;
+    btn.textContent = '⏹';
+    btn.title = '停止';
+  } else {
+    btn.disabled = !$('input').value.trim();
+    btn.textContent = '➤';
+    btn.title = '发送';
+  }
+}
+
+// 重写 sendBtn 点击行为：运行中点击 = 停止
+const origSend = send;
+window.send = function(){
+  if (running){ stopTask(); return; }
+  origSend();
+};
+
+// textarea 自适应
+const input = $('input');
+input.addEventListener('input', ()=>{
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 160) + 'px';
+  adjustSendBtn();
+});
+input.addEventListener('keydown', e=>{
+  if (e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    if (!running) send();
+  }
+});
+
+// ===== 设置抽屉 =====
+const drawer = {
+  open(){
+    $('cfgEndpoint').value = cfg.endpoint;
+    $('cfgProfile').value = cfg.profile;
+    $('cfgInstructions').value = cfg.instructions;
+    $('mask').classList.add('open');
+    $('drawer').classList.add('open');
+  },
+  close(){
+    $('mask').classList.remove('open');
+    $('drawer').classList.remove('open');
+  }
+};
+
+function saveCfg(){
+  cfg.endpoint = $('cfgEndpoint').value.trim() || defaultCfg.endpoint;
+  cfg.profile = $('cfgProfile').value.trim() || defaultCfg.profile;
+  cfg.instructions = $('cfgInstructions').value.trim();
+  saveCfgStore();
+  $('hdrProfile').textContent = cfg.profile;
+  drawer.close();
+  setStatus('设置已保存','ok');
+}
+
+// ===== 初始化 =====
+function init(){
+  $('hdrProfile').textContent = cfg.profile;
+  $('skipAskBtn').classList.toggle('active', cfg.skipAsk);
+  adjustSendBtn();
+  loadTasks();
+  reconnectIfRunning();  // 有后端执行中的任务则自动恢复展示（刷新不丢）
+  setStatus('就绪 · 输入主题开始生成研究报告','ok');
+}
+init();
+
+// 全局暴露
+window.send = send; window.newChat = newChat; window.useExample = useExample;
+window.toggleSkipAsk = toggleSkipAsk; window.drawer = drawer; window.saveCfg = saveCfg;
+window.resumeTask = resumeTask; window.closeToast = closeToast;
+</script>
+</body>
+</html>
