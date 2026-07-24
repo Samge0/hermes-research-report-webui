@@ -2,6 +2,8 @@
 
 一个单文件 HTML 前端 + 独立 Python 后端服务，通过 subprocess 调用 `hermes chat`，以 **SSE 流式**实时推送 Agent 进度给浏览器。
 
+<img width="1328" height="1007" alt="截图 2026-07-24 15-25-48" src="https://github.com/user-attachments/assets/f4ee0347-5003-4ed0-880e-f881caf34a2c" />
+
 ## 文件
 
 | 文件 | 说明 |
@@ -49,6 +51,9 @@ cd /path/to/custom-research-agent
 
 # 2) 用 hermes 自带的 venv 启动后端（该 venv 已含 aiohttp 依赖）
 ~/.hermes/hermes-agent/venv/bin/python3 server.py
+
+如果是windows系统:
+C:/Users/<username>/AppData/Local/hermes/hermes-agent/venv/Scripts/python.exe server.py
 
 #    若 hermes 安装在非默认位置，用环境变量覆盖可执行文件路径：
 #    HERMES_BIN=/path/to/hermes ~/.hermes/hermes-agent/venv/bin/python3 server.py
