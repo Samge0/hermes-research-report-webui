@@ -2,6 +2,9 @@
 
 一个单文件 HTML 前端 + 独立 Python 后端服务，通过 subprocess 调用 `hermes chat`，以 **SSE 流式**实时推送 Agent 进度给浏览器。
 
+
+> 🌐 **[在线宣传页](https://samge0.github.io/hermes-research-report-webui/)** — 可视化了解功能特性与工作流程
+
 <img width="1328" height="1007" alt="截图 2026-07-24 15-25-48" src="https://github.com/user-attachments/assets/f4ee0347-5003-4ed0-880e-f881caf34a2c" />
 
 ## 文件
